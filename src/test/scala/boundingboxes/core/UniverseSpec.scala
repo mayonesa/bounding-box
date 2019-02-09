@@ -44,4 +44,14 @@ class UniverseSpec extends FlatSpec {
     val row1234 = row123.appendRow.appendDash.appendDash.appendAsterisk.appendDash.appendDash.appendDash.appendDash.appendAsterisk.appendAsterisk.appendAsterisk.appendDash.appendDash
     assert(row1234.largestNonoverlappingBoxes.isEmpty)
   }
+  "tear design" should "capture box" in {
+    val row1 = Universe.empty.appendRow.appendDash.appendAsterisk.appendAsterisk.appendAsterisk
+    val row12 = row1.appendRow.appendDash.appendAsterisk.appendDash.appendAsterisk
+    val expBox = new BoundingBox(1, 2)
+    expBox.addAsterisk(1, 3)
+    expBox.addAsterisk(1, 4)
+    expBox.addAsterisk(2, 2)
+    expBox.addAsterisk(2, 4)
+    assert(row12.largestNonoverlappingBoxes.head.toString === expBox.toString)
+  }
 }

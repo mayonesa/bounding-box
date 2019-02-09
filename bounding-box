@@ -1,0 +1,21 @@
+#!/bin/sh
+exec scala -savecompiled "$0" "$@"
+!#
+
+import scala.io.StdIn
+import annotation.tailrec
+import boundingboxes.core.Universe
+
+@tailrec
+def loop(u0: Universe): Universe = {
+  val line = StdIn.readLine()
+  if (line == null) u0
+  else loop(line.foldLeft(u0.appendRow) { (u1, c) =>
+    if (c == '*') u1.appendAsterisk
+    else u1.appendDash
+  })
+}
+
+val largestBoxes = loop(Universe.empty).largestNonoverlappingBoxes
+largestBoxes.foreach(println)
+System.exit(if (largestBoxes.isEmpty) -1 else 0)

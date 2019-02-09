@@ -1,0 +1,13 @@
+.cache-main
+.cache-tests
+.classpath
+.project
+.settings/
+bin/
+target/
+**/.DS_Store
+*.tar.gz
+*.txt
+*.jar
+#boundingboxes
+**/*.class

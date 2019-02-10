@@ -12,7 +12,7 @@ trait Universe {
 }
 
 object Universe {
-  def empty: Universe = new UniverseImpl(BoxHistory.empty, Set.empty)
+  def empty: Universe = Universe(BoxHistory.empty, Set.empty)
   private def apply(h: BoxHistory, bs: Set[BoundingBox]) = new UniverseImpl(h, bs)
 
   private class UniverseImpl(h: BoxHistory, bs: Set[BoundingBox]) extends Universe {

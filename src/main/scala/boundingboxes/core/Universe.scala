@@ -13,38 +13,38 @@ trait Universe {
 
 object Universe {
   def empty: Universe = new UniverseImpl(BoxHistory.empty, Set.empty)
+  private def apply(h: BoxHistory, bs: Set[BoundingBox]) = new UniverseImpl(h, bs)
 
   private class UniverseImpl(h: BoxHistory, bs: Set[BoundingBox]) extends Universe {
-    def appendDash: Universe = new UniverseImpl(h :+, bs)
+    def appendDash: Universe = Universe(h :+, bs)
     def appendAsterisk: Universe = {
       val upOpt = h.up
       h.back match {
         case Some(backBox) =>
-          lazy val useBack = new UniverseImpl(h :+ backBox, bs)
+          lazy val useBack = Universe(h :+ backBox, bs)
           upOpt match {
             case Some(upBox) =>
               if (backBox == upBox) useBack
-              else new UniverseImpl(merge(backBox, upBox) :+ upBox, bs - backBox)
+              else Universe(merge(backBox, upBox) :+ upBox, bs - backBox)
             case None => useBack
           }
         case None =>
           upOpt match {
-            case Some(upBox) => new UniverseImpl(h :+ upBox, bs)
+            case Some(upBox) => Universe(h :+ upBox, bs)
             case None =>
               val (newBox, newHist) = h.newBox
-              new UniverseImpl(newHist, bs + newBox)
+              Universe(newHist, bs + newBox)
           }
       }
     }
-    def appendRow: Universe = new UniverseImpl(h.appendRow, bs)
+    def appendRow: Universe = Universe(h.appendRow, bs)
     def largestNonoverlappingBoxes: Set[BoundingBox] = largests(nonoverlapping(real))
     override def toString = bs.mkString("\n")
 
     private def real = bs.filter(_.is2d)
     private def merge(absorbed: BoundingBox, into: BoundingBox) = {
-      val newHist = h.replacedContiguousBackBoxesWith(into)
       into.absorb(absorbed)
-      newHist
+      h.replacedContiguousBackBoxesWith(into)
     }
   }
 

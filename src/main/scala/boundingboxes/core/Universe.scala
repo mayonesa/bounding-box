@@ -20,11 +20,12 @@ object Universe {
       val upOpt = h.up
       h.back match {
         case Some(backBox) =>
+          lazy val useBack = new UniverseImpl(h :+ backBox, bs)
           upOpt match {
             case Some(upBox) =>
-              if (backBox == upBox) new UniverseImpl(h :+ backBox, bs)
+              if (backBox == upBox) useBack
               else new UniverseImpl(merge(backBox, upBox) :+ upBox, bs - backBox)
-            case None => new UniverseImpl(h :+ backBox, bs)
+            case None => useBack
           }
         case None =>
           upOpt match {

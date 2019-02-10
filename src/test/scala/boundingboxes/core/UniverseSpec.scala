@@ -65,4 +65,19 @@ class UniverseSpec extends FlatSpec {
     expBox.addAsterisk(3, 4)
     assert(row1234.largestNonoverlappingBoxes.map(_.toString) === Set(expBox.toString))
   }
+  "long line and dip" should "not show up and be complete, respectively" in {
+    val row1 = Universe.empty.appendRow.appendDash.appendDash.appendDash.appendDash.appendAsterisk.appendAsterisk.appendAsterisk.appendDash.appendAsterisk.appendAsterisk.appendDash.appendDash
+    val row12 = row1.appendRow.appendDash.appendAsterisk.appendDash.appendDash.appendDash.appendDash.appendAsterisk.appendAsterisk.appendAsterisk.appendDash.appendAsterisk.appendDash
+    val row123 = row12.appendRow.appendDash.appendDash.appendDash.appendDash.appendDash.appendDash.appendDash.appendDash.appendDash.appendDash.appendDash.appendDash
+    val row1234 = row123.appendRow.appendAsterisk.appendAsterisk.appendAsterisk.appendAsterisk.appendAsterisk.appendAsterisk.appendAsterisk.appendAsterisk.appendAsterisk.appendAsterisk.appendAsterisk.appendAsterisk
+    val expBox = new BoundingBox(1, 5)
+    expBox.addAsterisk(1, 6)
+    expBox.addAsterisk(1, 7)
+    expBox.addAsterisk(1, 9)
+    expBox.addAsterisk(1, 10)
+    expBox.addAsterisk(2, 7)
+    expBox.addAsterisk(2, 8)
+    expBox.addAsterisk(2, 9)
+    assert(row1234.largestNonoverlappingBoxes.map(_.toString) === Set(expBox.toString))
+  }
 }

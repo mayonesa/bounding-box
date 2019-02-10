@@ -54,4 +54,15 @@ class UniverseSpec extends FlatSpec {
     expBox.addAsterisk(2, 4)
     assert(row12.largestNonoverlappingBoxes.head.toString === expBox.toString)
   }
+  "adjacent boxes" should "not overlap" in {
+    val row1 = Universe.empty.appendRow.appendAsterisk.appendAsterisk.appendDash.appendDash.appendDash.appendDash.appendDash.appendDash.appendDash.appendAsterisk.appendAsterisk.appendAsterisk
+    val row12 = row1.appendRow.appendDash.appendAsterisk.appendDash.appendDash.appendAsterisk.appendAsterisk.appendDash.appendDash.appendAsterisk.appendAsterisk.appendAsterisk.appendDash
+    val row123 = row12.appendRow.appendDash.appendDash.appendAsterisk.appendAsterisk.appendDash.appendAsterisk.appendAsterisk.appendAsterisk.appendDash.appendDash.appendAsterisk.appendAsterisk
+    val row1234 = row123.appendRow.appendDash.appendAsterisk.appendAsterisk.appendDash.appendDash.appendDash.appendDash.appendAsterisk.appendAsterisk.appendAsterisk.appendDash.appendDash
+    val expBox = new BoundingBox(3, 3)
+    expBox.addAsterisk(4, 2)
+    expBox.addAsterisk(4, 3)
+    expBox.addAsterisk(3, 4)
+    assert(row1234.largestNonoverlappingBoxes.map(_.toString) === Set(expBox.toString))
+  }
 }

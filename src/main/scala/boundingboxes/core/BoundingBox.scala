@@ -10,16 +10,16 @@ private[core] class BoundingBox(x: Int, y: Int) {
   private var asterisks = Set(p)
   
   private[core] def addAsterisk(x: Int, y: Int) = {
-		asterisks = asterisks + Point(x, y)
-		if (x < topLeft.x) {
-		  topLeft = Point(x, min(y, topLeft.y))
-		} else if (y < topLeft.y) {
-		  topLeft = Point(topLeft.x, y)
-		}
-		if (x > bottomRight.x) {
-		  bottomRight = Point(x, max(y, bottomRight.y))
-		} else if (y > bottomRight.y) {
-		  bottomRight = Point(bottomRight.x, y)
+    asterisks = asterisks + Point(x, y)
+    if (x < topLeft.x) {
+      topLeft = Point(x, min(y, topLeft.y))
+    } else if (y < topLeft.y) {
+      topLeft = Point(topLeft.x, y)
+    }
+    if (x > bottomRight.x) {
+      bottomRight = Point(x, max(y, bottomRight.y))
+    } else if (y > bottomRight.y) {
+      bottomRight = Point(bottomRight.x, y)
     }
   }
   private[core] def area = (bottomRight.x - topLeft.x + 1) * (bottomRight.y - topLeft.y + 1)

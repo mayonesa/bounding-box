@@ -30,9 +30,10 @@ private[core] class BoundingBox(x: Int, y: Int) {
   private[core] def is2d = bottomRight.x - topLeft.x > 0 && bottomRight.y - topLeft.y > 0
   private[core] def overlaps(that: BoundingBox) = {
     def between(coord: Point => Int) = {
-      def in(ends: BoundingBox, mid: BoundingBox) = {
-        val midCoord = coord(mid.topLeft)
-        coord(ends.topLeft) <= midCoord && midCoord <= coord(ends.bottomRight)
+     def le(l: Point, r: Point) = coord(l) <= coord(r)
+     def in(ends: BoundingBox, mid: BoundingBox) = {
+        val mtl = mid.topLeft
+        le(ends.topLeft, mtl) && le(mtl, ends.bottomRight)
       }
       in(this, that) || in(that, this)
     }

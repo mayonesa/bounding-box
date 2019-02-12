@@ -14,6 +14,17 @@ class UniverseSpec extends FlatSpec {
     expBox.addAsterisk(2, 2)
     assert(row1234.largestNonoverlappingBoxes.map(_.toString) === Set(expBox.toString))
   }
+  "next-row asterisk after asterisk" should "be separate boxes" in {
+    val row1 = Universe(12).appendAsterisk.appendAsterisk.appendDash.appendDash.appendDash.appendDash.appendDash.appendDash.appendDash.appendAsterisk.appendAsterisk.appendAsterisk
+    val row12 = row1.appendAsterisk.appendAsterisk.appendDash.appendDash.appendAsterisk.appendAsterisk.appendDash.appendDash.appendAsterisk
+    val bug = row12.appendAsterisk.appendAsterisk.appendDash
+    val row123 = bug.appendDash.appendDash.appendDash.appendDash.appendDash.appendAsterisk.appendAsterisk.appendAsterisk.appendDash.appendDash.appendAsterisk.appendAsterisk
+    val row1234 = row123.appendDash.appendDash.appendDash.appendDash.appendDash.appendDash.appendDash.appendAsterisk.appendAsterisk.appendAsterisk.appendDash.appendDash
+    val expBox = new BoundingBox(1, 1)
+    expBox.addAsterisk(1, 2)
+    expBox.addAsterisk(2, 2)
+    assert(row1234.largestNonoverlappingBoxes.map(_.toString) === Set(expBox.toString))
+  }
   "single asterisks" should "have no effect" in {
     val row1 = Universe(12).appendAsterisk.appendAsterisk.appendDash.appendDash.appendDash.appendDash.appendDash.appendDash.appendDash.appendAsterisk.appendAsterisk.appendAsterisk
     val row12 = row1.appendDash.appendAsterisk.appendDash.appendDash.appendAsterisk.appendAsterisk.appendDash.appendDash.appendAsterisk.appendAsterisk.appendAsterisk.appendDash

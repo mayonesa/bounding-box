@@ -17,20 +17,23 @@ object FixedSparseQueue {
     new FixedSparseQueueImpl(m, i, depth)
 
   private class FixedSparseQueueImpl[A](m: Map[Int, A], i: Int, val depth: Int) extends FixedSparseQueue[A] {
-    def enqueue: FixedSparseQueue[A] = fsq(m - nextI, nextI)
-    def enqueue(a: A): FixedSparseQueue[A] = fsq(m - nextI + (i -> a), i + 1)
+    def enqueue: FixedSparseQueue[A] = fsq(m - i, nextI)
+    def enqueue(a: A): FixedSparseQueue[A] = fsq(m + (i -> a), nextI)
     def replacedContigousBackBy(a: A, limit: Int): FixedSparseQueue[A] = {
       @tailrec
       def loop(i0: Int, m0: Map[Int, A]): Map[Int, A] = {
-        if (m0.contains(i0)) loop(i0 - 1, m0.updated(i0, a))
+        val nIters = circ((i - i0) + depth)
+        if (nIters <= limit && m0.contains(i0)) loop(prev(i0), m0.updated(i0, a))
         else m0
       }
-      fsq(loop(i, m), i)
+      fsq(loop(prev(i), m), i)
     }
-    def head: Option[A] = m.get(i)
-    def last: Option[A] = m.get(nextI)
+    def head: Option[A] = m.get(circ(i - 1))
+    def last: Option[A] = m.get(i)
 
-    private def nextI = if (i == depth) 0 else i
+    private def prev(i0: Int) = circ(i0 - 1)
+    private def nextI = circ(i + 1)
+    private def circ(i0: Int) = i0 % depth
     private def fsq(m0: Map[Int, A], i: Int) = FixedSparseQueue(m0, i, depth)
   }
 }

@@ -13,23 +13,25 @@ trait BoxHistory {
 }
 
 object BoxHistory {
-  def apply(depth: Int): BoxHistory = BoxHistory(FixedSparseQueue(depth), 0, 0)
-  private def apply(q: FixedSparseQueue[BoundingBox], i: Int, j: Int) =
-    new BoxHistoryImpl(q, i, if (j > q.depth) 1 else j)
+  def apply(depth: Int): BoxHistory = BoxHistory(FixedSparseQueue(depth), 1, 1)
+  private def apply(q: FixedSparseQueue[BoundingBox], i: Int, j: Int) = new BoxHistoryImpl(q, i,  j)
   
   private class BoxHistoryImpl(q: FixedSparseQueue[BoundingBox], i: Int, j: Int) extends BoxHistory {
-    def :+ : BoxHistory = BoxHistory(q.enqueue, i, j + 1)
+    def :+ : BoxHistory = bh(q.enqueue, j + 1)
     def :+ (b: BoundingBox): BoxHistory = {
       b.addAsterisk(i, j)
-      BoxHistory(q.enqueue(b), i, j + 1)
+      bh(q.enqueue(b), j + 1)
     }
     def newBox: (BoundingBox, BoxHistory) = {
-    		val nb = new BoundingBox(i, j)
-  			(nb, BoxHistory(q.enqueue(nb), i, j + 1))
+      val nb = new BoundingBox(i, j)
+      (nb, bh(q.enqueue(nb), j + 1))
     }
-    def replacedContiguousBackBoxesWith(b: BoundingBox): BoxHistory =
-      BoxHistory(q.replacedContigousBackBy(b, j), i, j)
+    def replacedContiguousBackBoxesWith(b: BoundingBox): BoxHistory = bh(q.replacedContigousBackBy(b, j), j)
     def up: Option[BoundingBox] = q.head
     def back: Option[BoundingBox] = q.last
+
+    private def bh(q0: FixedSparseQueue[BoundingBox], j0: Int) =
+      if (j0 > q.depth) BoxHistory(q0, i + 1, 1)
+      else BoxHistory(q0, i, j0)
   }
 }

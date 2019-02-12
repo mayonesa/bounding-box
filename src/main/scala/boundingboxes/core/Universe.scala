@@ -7,12 +7,11 @@ import boundingboxes.general.auxiliaries.removeAt
 trait Universe {
   def appendDash: Universe
   def appendAsterisk: Universe
-  def appendRow: Universe
   def largestNonoverlappingBoxes: Set[BoundingBox]
 }
 
 object Universe {
-  def empty: Universe = Universe(BoxHistory.empty, Set.empty)
+  def apply(width: Int): Universe = Universe(BoxHistory(width), Set.empty)
   private def apply(h: BoxHistory, bs: Set[BoundingBox]) = new UniverseImpl(h, bs)
 
   private class UniverseImpl(h: BoxHistory, bs: Set[BoundingBox]) extends Universe {
@@ -37,7 +36,6 @@ object Universe {
           }
       }
     }
-    def appendRow: Universe = Universe(h.appendRow, bs)
     def largestNonoverlappingBoxes: Set[BoundingBox] = largests(nonoverlapping(real))
     override def toString = bs.mkString("\n")
 

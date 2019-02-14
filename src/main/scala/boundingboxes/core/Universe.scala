@@ -2,7 +2,7 @@ package boundingboxes.core
 
 import annotation.tailrec
 import language.postfixOps
-import boundingboxes.general.auxiliaries.removeAt
+import boundingboxes.general.auxiliaries.RichVector
 
 trait Universe {
   def appendDash: Universe
@@ -15,8 +15,8 @@ object Universe {
   private def apply(h: BoxHistory, bs: Set[BoundingBox]) = new UniverseImpl(h, bs)
 
   private class UniverseImpl(h: BoxHistory, bs: Set[BoundingBox]) extends Universe {
-    def appendDash: Universe = Universe(h :+, bs)
-    def appendAsterisk: Universe = {
+    def appendDash = Universe(h :+, bs)
+    def appendAsterisk = {
       val upOpt = h.up
       h.back match {
         case Some(backBox) =>
@@ -36,7 +36,7 @@ object Universe {
           }
       }
     }
-    def largestNonoverlappingBoxes: Set[BoundingBox] = largests(nonoverlapping(real))
+    def largestNonoverlappingBoxes = largests(nonoverlapping(real))
     override def toString = bs.mkString("\n")
 
     private def real = bs.filter(_.is2d)
@@ -58,7 +58,7 @@ object Universe {
           else {
             val secondary = secondaries(j)
             if (secondary.overlaps(primary)) 
-              loop1(removeAt(j, secondaries), overlaps + primary + secondary)
+              loop1(secondaries.removeAt(j), overlaps + primary + secondary)
             else loop0(j + 1)
           }
         loop0(0)

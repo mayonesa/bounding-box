@@ -14,6 +14,28 @@ class UniverseSpec extends FlatSpec {
     expBox.addAsterisk(2, 2)
     assert(row1234.largestNonoverlappingBoxes.map(_.toString) === Set(expBox.toString))
   }
+  "0 nonoverlapping" should "return largest of all" in {
+    val row1 = Universe(12).appendAsterisk.appendAsterisk.appendDash.appendDash.appendDash.appendDash.appendDash.appendDash.appendDash.appendAsterisk.appendAsterisk.appendAsterisk
+    val row12 = row1.appendDash.appendAsterisk.appendDash.appendDash.appendAsterisk.appendAsterisk.appendDash.appendDash.appendAsterisk
+    val bug = row12.appendAsterisk.appendAsterisk.appendDash
+    val row123 = bug.appendDash.appendDash.appendDash.appendDash.appendDash.appendAsterisk.appendAsterisk.appendAsterisk.appendDash.appendDash.appendAsterisk.appendAsterisk
+    val row1234 = row123.appendDash.appendDash.appendDash.appendDash.appendDash.appendDash.appendDash.appendAsterisk.appendDash.appendDash.appendDash.appendDash
+    val expBox1 = new BoundingBox(1, 10)
+    expBox1.addAsterisk(1, 11)
+    expBox1.addAsterisk(1, 12)
+    expBox1.addAsterisk(2, 9)
+    expBox1.addAsterisk(2, 10)
+    expBox1.addAsterisk(2, 11)
+    expBox1.addAsterisk(3, 11)
+    expBox1.addAsterisk(3, 12)
+    val expBox2 = new BoundingBox(2, 5)
+    expBox2.addAsterisk(2, 6)
+    expBox2.addAsterisk(3, 6)
+    expBox2.addAsterisk(3, 7)
+    expBox2.addAsterisk(3, 8)
+    expBox2.addAsterisk(4, 8)
+    assert(row1234.largestNonoverlappingBoxes.map(_.toString) === Set(expBox1.toString, expBox2.toString))
+  }
   "next-row asterisk after asterisk" should "be separate boxes" in {
     val row1 = Universe(12).appendAsterisk.appendAsterisk.appendDash.appendDash.appendDash.appendDash.appendDash.appendDash.appendDash.appendAsterisk.appendAsterisk.appendAsterisk
     val row12 = row1.appendAsterisk.appendAsterisk.appendDash.appendDash.appendAsterisk.appendAsterisk.appendDash.appendDash.appendAsterisk

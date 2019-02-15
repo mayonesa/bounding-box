@@ -12,16 +12,17 @@ private[core] class BoundingBox(x: Int, y: Int) {
   
   private[core] def addAsterisk(x: Int, y: Int) = {
     asterisks = asterisks + Point(x, y)
-    if (x < topLeft.x) {
-      topLeft = Point(x, min(y, topLeft.y))
-    } else if (y < topLeft.y) {
-      topLeft = Point(topLeft.x, y)
+    def f(newPoint: Point => Unit, corner: Point, comp: (Int, Int) => Boolean, minMax: (Int, Int) => Int) = {
+      val cx = corner.x
+      val cy = corner.y
+      if (comp(x, cx)) {
+        newPoint(Point(x, minMax(y, cy)))
+      } else if (comp(y, cy)) {
+        newPoint(Point(cx, y))
+      }
     }
-    if (x > bottomRight.x) {
-      bottomRight = Point(x, max(y, bottomRight.y))
-    } else if (y > bottomRight.y) {
-      bottomRight = Point(bottomRight.x, y)
-    }
+    f(topLeft = _, topLeft, _ < _, min)
+    f(bottomRight = _, bottomRight, _ > _, max)
   }
   private[core] def area = length(xf) * length(yf)
   private[core] def absorb(absorbed: BoundingBox) =

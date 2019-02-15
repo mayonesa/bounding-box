@@ -2,6 +2,7 @@ package boundingboxes.core
 
 import boundingboxes.general.Point
 import math.{ max, min }
+import BoundingBox._
 
 private[core] class BoundingBox(x: Int, y: Int) {
   private val p =  Point(x, y)
@@ -22,12 +23,12 @@ private[core] class BoundingBox(x: Int, y: Int) {
       bottomRight = Point(bottomRight.x, y)
     }
   }
-  private[core] def area = (bottomRight.x - topLeft.x + 1) * (bottomRight.y - topLeft.y + 1)
+  private[core] def area = length(xf) * length(yf)
   private[core] def absorb(absorbed: BoundingBox) =
     absorbed.asterisks.foreach { p =>
       addAsterisk(p.x, p.y)
     }
-  private[core] def is2d = bottomRight.x - topLeft.x > 0 && bottomRight.y - topLeft.y > 0
+  private[core] def is2d = hasDepth(xf) && hasDepth(yf)
   private[core] def overlaps(that: BoundingBox) = {
     def between(coord: Point => Int) = {
      def le(l: Point, r: Point) = coord(l) <= coord(r)
@@ -37,7 +38,14 @@ private[core] class BoundingBox(x: Int, y: Int) {
       }
       in(this, that) || in(that, this)
     }
-    between(_.x) && between(_.y)
+    between(xf) && between(yf)
   }
+  private def hasDepth(coord: Point => Int) = coord(bottomRight) - coord(topLeft) > 0
+  private def length(coord: Point => Int) = coord(bottomRight) - coord(topLeft) + 1
   override def toString = topLeft.toString + bottomRight.toString
+}
+
+private object BoundingBox {
+  private val xf: Point => Int = _.x
+  private val yf: Point => Int = _.y
 }

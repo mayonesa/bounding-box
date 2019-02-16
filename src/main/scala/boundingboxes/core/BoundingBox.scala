@@ -12,13 +12,13 @@ private[core] class BoundingBox(x: Int, y: Int) {
   
   private[core] def addAsterisk(x: Int, y: Int) = {
     asterisks = asterisks + Point(x, y)
-    def f(setTlBr: Point => Unit, corner: Point, comp: (Int, Int) => Boolean, minMax: (Int, Int) => Int) = {
-      val cx = corner.x
-      val cy = corner.y
-      if (comp(x, cx)) {
-        setTlBr(Point(x, minMax(y, cy)))
-      } else if (comp(y, cy)) {
-        setTlBr(Point(cx, y))
+    def f(setTlBr: Point => Unit, tlBr: Point, comp: (Int, Int) => Boolean, minMax: (Int, Int) => Int) = {
+      val tlBrX = tlBr.x
+      val tlBrY = tlBr.y
+      if (comp(x, tlBrX)) {
+        setTlBr(Point(x, minMax(y, tlBrY)))
+      } else if (comp(y, tlBrY)) {
+        setTlBr(Point(tlBrX, y))
       }
     }
     f(topLeft = _, topLeft, _ < _, min)

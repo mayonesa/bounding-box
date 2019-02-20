@@ -30,7 +30,7 @@ So, given the file “groups.txt” with the following content:
 -------***--
 ```
 
-Running your program with this input would look something like this:
+With this input:
 ```
 > cat groups.txt | bounding-box
 (1,1)(2,2)

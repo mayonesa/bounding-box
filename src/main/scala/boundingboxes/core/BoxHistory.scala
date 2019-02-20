@@ -1,42 +1,36 @@
 package boundingboxes.core
 
-import annotation.tailrec
+import boundingboxes.general.FixedSparseQueue
 
 trait BoxHistory {
   def :+ : BoxHistory
   def :+ (b: BoundingBox): BoxHistory
   def newBox: (BoundingBox, BoxHistory)
   def replacedContiguousBackBoxesWith(b: BoundingBox): BoxHistory
-  def appendRow: BoxHistory
   def up: Option[BoundingBox]
   def back: Option[BoundingBox]
 }
 
 object BoxHistory {
-  def empty[A]: BoxHistory = new BoxHistoryImpl(Map.empty, Map.empty, 0, 0)
-  private def apply(priorRow: Map[Int, BoundingBox], currentRow: Map[Int, BoundingBox], i: Int, j: Int) =
-    new BoxHistoryImpl(priorRow, currentRow, i, j)
+  def apply(depth: Int): BoxHistory = BoxHistory(FixedSparseQueue(depth), 1, 1)
+  private def apply(q: FixedSparseQueue[BoundingBox], i: Int, j: Int) = new BoxHistoryImpl(q, i,  j)
   
-  private class BoxHistoryImpl(priorRow: Map[Int, BoundingBox], currentRow: Map[Int, BoundingBox], i: Int, j: Int) extends BoxHistory {
-    def :+ : BoxHistory = BoxHistory(priorRow, currentRow, i, j + 1)
-    def :+ (b: BoundingBox): BoxHistory = {
+  private class BoxHistoryImpl(q: FixedSparseQueue[BoundingBox], i: Int, j: Int) extends BoxHistory {
+    def :+ = bh(q.enqueue, j + 1)
+    def :+ (b: BoundingBox) = {
       b.addAsterisk(i, j)
-      BoxHistory(priorRow, currentRow + (j -> b), i, j + 1)
+      bh(q.enqueue(b), j + 1)
     }
-    def replacedContiguousBackBoxesWith(b: BoundingBox): BoxHistory = {
-      @tailrec
-      def loop(j0: Int, row: Map[Int, BoundingBox]): Map[Int, BoundingBox] = {
-        if (row.contains(j0)) loop(j0 - 1, row.updated(j0, b))
-        else row
-      }
-      BoxHistory(priorRow, loop(j - 1, currentRow), i, j)
-    }
-    def newBox: (BoundingBox, BoxHistory) = {
+    def newBox = {
       val nb = new BoundingBox(i, j)
-      (nb, BoxHistory(priorRow, currentRow + (j -> nb), i, j + 1))
+      (nb, bh(q.enqueue(nb), j + 1))
     }
-    def appendRow: BoxHistory = BoxHistory(currentRow, Map.empty, i + 1, 1)
-    def up: Option[BoundingBox] = priorRow.get(j)
-    def back: Option[BoundingBox] = currentRow.get(j - 1)
+    def replacedContiguousBackBoxesWith(b: BoundingBox) = bh(q.replacedContigousBackBy(b, j), j)
+    def up = q.head
+    def back = q.last
+
+    private def bh(q0: FixedSparseQueue[BoundingBox], j0: Int) =
+      if (j0 > q.depth) BoxHistory(q0, i + 1, 1)
+      else BoxHistory(q0, i, j0)
   }
 }

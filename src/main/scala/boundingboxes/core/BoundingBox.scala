@@ -2,6 +2,7 @@ package boundingboxes.core
 
 import boundingboxes.general.Point
 import math.{ max, min }
+import BoundingBox._
 
 private[core] class BoundingBox(x: Int, y: Int) {
   private val p =  Point(x, y)
@@ -11,23 +12,24 @@ private[core] class BoundingBox(x: Int, y: Int) {
   
   private[core] def addAsterisk(x: Int, y: Int) = {
     asterisks = asterisks + Point(x, y)
-    if (x < topLeft.x) {
-      topLeft = Point(x, min(y, topLeft.y))
-    } else if (y < topLeft.y) {
-      topLeft = Point(topLeft.x, y)
+    def f(setTlBr: Point => Unit, tlBr: Point, comp: (Int, Int) => Boolean, minMax: (Int, Int) => Int) = {
+      val tlBrX = tlBr.x
+      val tlBrY = tlBr.y
+      if (comp(x, tlBrX)) {
+        setTlBr(Point(x, minMax(y, tlBrY)))
+      } else if (comp(y, tlBrY)) {
+        setTlBr(Point(tlBrX, y))
+      }
     }
-    if (x > bottomRight.x) {
-      bottomRight = Point(x, max(y, bottomRight.y))
-    } else if (y > bottomRight.y) {
-      bottomRight = Point(bottomRight.x, y)
-    }
+    f(topLeft = _, topLeft, _ < _, min)
+    f(bottomRight = _, bottomRight, _ > _, max)
   }
-  private[core] def area = (bottomRight.x - topLeft.x + 1) * (bottomRight.y - topLeft.y + 1)
+  private[core] def area = length(xf) * length(yf)
   private[core] def absorb(absorbed: BoundingBox) =
     absorbed.asterisks.foreach { p =>
       addAsterisk(p.x, p.y)
     }
-  private[core] def is2d = bottomRight.x - topLeft.x > 0 && bottomRight.y - topLeft.y > 0
+  private[core] def is2d = hasDepth(xf) && hasDepth(yf)
   private[core] def overlaps(that: BoundingBox) = {
     def between(coord: Point => Int) = {
      def le(l: Point, r: Point) = coord(l) <= coord(r)
@@ -37,7 +39,14 @@ private[core] class BoundingBox(x: Int, y: Int) {
       }
       in(this, that) || in(that, this)
     }
-    between(_.x) && between(_.y)
+    between(xf) && between(yf)
   }
+  private def hasDepth(coord: Point => Int) = coord(bottomRight) - coord(topLeft) > 0
+  private def length(coord: Point => Int) = coord(bottomRight) - coord(topLeft) + 1
   override def toString = topLeft.toString + bottomRight.toString
+}
+
+private object BoundingBox {
+  private val xf: Point => Int = _.x
+  private val yf: Point => Int = _.y
 }

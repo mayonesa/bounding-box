@@ -7,15 +7,14 @@ import annotation.tailrec
 import boundingboxes.core.Universe
 
 @tailrec
-def loop(u0: Universe): Universe = {
-  val line = StdIn.readLine()
+def loop(line: String, u0: Universe): Universe =
   if (line == null) u0
-  else loop(line.foldLeft(u0.appendRow) { (u1, c) =>
+  else loop(StdIn.readLine(), line.foldLeft(u0) { (u1, c) =>
     if (c == '*') u1.appendAsterisk
     else u1.appendDash
   })
-}
 
-val largestBoxes = loop(Universe.empty).largestNonoverlappingBoxes
+val firstLine = StdIn.readLine()
+val largestBoxes = loop(firstLine, Universe(firstLine.length)).largestNonoverlappingBoxes
 largestBoxes.foreach(println)
 System.exit(if (largestBoxes.isEmpty) -1 else 0)
